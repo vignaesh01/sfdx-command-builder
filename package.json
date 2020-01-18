@@ -41,11 +41,11 @@
     "vscode": "^1.1.28",
     "tslint": "^5.12.1",
     "@types/node": "^10.12.21",
-    "@types/mocha": "^2.2.42"
+    "@types/mocha": "^2.2.42",
+    "babel-cli": "^6.26.0",
+    "babel-preset-react-app": "^3.1.2"
   },
   "dependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-react-app": "^3.1.2",
     "clipboardy": "^2.1.0"
   },
   "keywords": [
