@@ -1,0 +1,55 @@
+{
+  "name": "sfdx-command-builder",
+  "displayName": "Salesforce CLI Command Builder",
+  "description": "GUI to build Salesforce CLI commands in VS Code",
+  "version": "0.0.1",
+  "publisher": "VignaeshRamA",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.26.0"
+  },
+  "categories": [
+    "Extension Packs",
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:sfdxCmdBuilder.openCmdBuilder"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "sfdxCmdBuilder.openCmdBuilder",
+        "title": "Open Command Builder",
+        "category": "SFDX "
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "npm run compile && node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "typescript": "^3.3.1",
+    "vscode": "^1.1.28",
+    "tslint": "^5.12.1",
+    "@types/node": "^10.12.21",
+    "@types/mocha": "^2.2.42"
+  },
+  "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-react-app": "^3.1.2",
+    "clipboardy": "^2.1.0"
+  },
+  "keywords": [
+    "sfdx",
+		"salesforcedx",
+		"sfdx cli",
+		"salesforce cli",
+		"salesforce cli command builder"],
+  "author": "",
+  "license": "ISC"
+}
