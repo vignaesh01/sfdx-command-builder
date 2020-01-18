@@ -2,7 +2,7 @@
   "name": "sfdx-command-builder",
   "displayName": "Salesforce CLI Command Builder",
   "description": "GUI to build Salesforce CLI commands in VS Code",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vignaesh01/sfdx-command-builder.git"
