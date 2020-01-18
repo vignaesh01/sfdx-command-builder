@@ -9,9 +9,9 @@ Before you set up Salesforce CLI Command Builder for VS Code, make sure that you
 - Visual Studio Code v1.26 or later
 
 ## Screenshots
-![Screenshot 1](sfdx-cmd-builder1.png)
+![Screenshot 1](sfdx-cmd-builder1.PNG)
 
-![Screenshot 2](sfdx-cmd-builder1.png)
+![Screenshot 2](sfdx-cmd-builder1.PNG)
 
 ## How to use?
 - Open the command palette (press Ctrl+Shift+P on Windows or Linux, or Cmd+Shift+P on macOS) and run **SFDX : Open Command Builder** command.
