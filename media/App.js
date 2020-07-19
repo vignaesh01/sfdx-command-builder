@@ -193,7 +193,8 @@ var SearchCommand = function (_React$Component2) {
     _this2.commands = _this2.props.commands || [];
     console.log("this.commands");
     console.log(_this2.commands);
-    _this2.finalCommands = _this2.getFinalCommands();
+    //this.finalCommands=this.getFinalCommands();
+    _this2.finalCommands = _this2.commands;
     _this2.state = {
       filteredCommands: _this2.finalCommands
     };
@@ -208,15 +209,14 @@ var SearchCommand = function (_React$Component2) {
       var filteredArr = this.getFilteredCommands(value);
       this.setState({ filteredCommands: filteredArr });
     }
-  }, {
-    key: 'getFinalCommands',
-    value: function getFinalCommands() {
-      var finalCommandsArr = this.commands.filter(function (command) {
-        return !(command.mainTopic || command.hidden);
-      });
 
-      return finalCommandsArr;
-    }
+    /*getFinalCommands(){
+      let finalCommandsArr = this.commands.filter(command=>{
+        return !(command.mainTopic || command.hidden);
+        });
+        return finalCommandsArr;
+    }*/
+
   }, {
     key: 'getFilteredCommands',
     value: function getFilteredCommands(filterKey) {
@@ -226,11 +226,11 @@ var SearchCommand = function (_React$Component2) {
 
         var flag = false;
 
-        if (command && command.name && command.name != "" && command.name.toUpperCase().includes(filterKey.toUpperCase())) {
+        if (command && command.id && command.id != "" && command.id.toUpperCase().includes(filterKey.toUpperCase())) {
           flag |= true;
         }
 
-        if (command && command.longDescription && command.longDescription != "" && command.longDescription.toUpperCase().includes(filterKey.toUpperCase())) {
+        if (command && command.description && command.description != "" && command.description.toUpperCase().includes(filterKey.toUpperCase())) {
           flag |= true;
         }
 
@@ -256,10 +256,10 @@ var SearchCommand = function (_React$Component2) {
 
         return React.createElement(
           ListItem,
-          { button: true, key: command.name, divider: true, alignItems: 'flex-start',
+          { button: true, key: command.id, divider: true, alignItems: 'flex-start',
             onClick: _this3.handleCommandClick.bind(_this3, command) },
-          React.createElement(ListItemText, { primary: command.name,
-            secondary: command.longDescription })
+          React.createElement(ListItemText, { primary: command.id,
+            secondary: command.description })
         );
       });
 
@@ -321,7 +321,7 @@ var CommandBuilder = function (_React$Component3) {
           var flag = message.results;
           console.log("Inside onFileSelected listener " + flag.value);
           var selCommand = _this4.props.selectedCommand;
-          var fileFlags = selCommand.flags.filter(function (flg) {
+          var fileFlags = Object.values(selCommand.flags).filter(function (flg) {
             return flg.name == flag.name;
           });
 
@@ -365,7 +365,7 @@ var CommandBuilder = function (_React$Component3) {
               React.createElement(
                 Typography,
                 { variant: 'body2', gutterBottom: true },
-                this.state.selCommand.longDescription
+                this.state.selCommand.description
               ),
               React.createElement('br', null),
               React.createElement(
@@ -446,7 +446,17 @@ var CommandBuilder = function (_React$Component3) {
                 React.createElement(
                   TableBody,
                   null,
-                  this.state.selCommand.flags.map(function (flag) {
+                  /*this.state.selCommand.flags.map(flag => (
+                   <TableRow key={flag.name}>
+                     <TableCell component="th" scope="row">
+                       
+                       {this.getFlagControl(flag)}
+                   
+                     </TableCell>
+                     <TableCell>{flag.description}</TableCell>
+                   </TableRow>
+                  ))*/
+                  Object.values(this.state.selCommand.flags).map(function (flag) {
                     return React.createElement(
                       TableRow,
                       { key: flag.name },
@@ -458,7 +468,7 @@ var CommandBuilder = function (_React$Component3) {
                       React.createElement(
                         TableCell,
                         null,
-                        flag.longDescription
+                        flag.description
                       )
                     );
                   })
@@ -541,9 +551,34 @@ var CommandBuilder = function (_React$Component3) {
           type: 'number',
           label: flag.name, variant: 'outlined',
           value: flag.value, onChange: this.handleFlagChange.bind(this, flag) });
+      } else if (flag.type == 'option' && flag.options && Array.isArray(flag.options)) {
+        //select box control
+        flagControl = React.createElement(
+          TextField,
+          {
+            id: 'flagControl',
+            required: flag.required,
+            select: true,
+            label: flag.name,
+            value: flag.value,
+            onChange: this.handleFlagChange.bind(this, flag),
+            SelectProps: {
+              native: true
+            },
+            variant: 'outlined'
+          },
+          React.createElement('option', { key: 'emptyVal', value: '' }),
+          flag.options.map(function (val) {
+            return React.createElement(
+              'option',
+              { key: val, value: val },
+              val
+            );
+          })
+        );
       } else {
         flagControl = React.createElement(TextField, { id: 'flagControl',
-          required: flag.required,
+          required: flag.required || false,
           label: flag.name, variant: 'outlined',
           value: flag.value, onChange: this.handleFlagChange.bind(this, flag) });
       }
@@ -584,13 +619,13 @@ var CommandBuilder = function (_React$Component3) {
     value: function generateCommand() {
       console.log('Inside generateCommand()');
 
-      var generatedCmd = 'sfdx ' + this.props.selectedCommand.name;
+      var generatedCmd = 'sfdx ' + this.props.selectedCommand.id;
       var genFlag = '';
       var selCommand = this.props.selectedCommand;
 
       console.log('Inside generateCommand() ' + generatedCmd + ' ' + JSON.stringify(selCommand));
 
-      selCommand.flags.forEach(function (flag) {
+      Object.values(selCommand.flags).forEach(function (flag) {
 
         if (flag.value && flag.value !== '') {
           if (flag.type == 'boolean') {
@@ -644,7 +679,7 @@ function CommandAppBar(props) {
 
   var showHelp = function showHelp() {
 
-    var helpCmd = 'sfdx ' + props.selectedCommand.name + ' --help';
+    var helpCmd = 'sfdx ' + props.selectedCommand.id + ' --help';
     vscode.postMessage({
       command: 'executeCommand',
       generatedCmd: helpCmd
@@ -673,7 +708,7 @@ function CommandAppBar(props) {
         React.createElement(
           Typography,
           { variant: 'h6', className: classes.title },
-          props.selectedCommand.name
+          props.selectedCommand.id
         ),
         React.createElement(
           IconButton,

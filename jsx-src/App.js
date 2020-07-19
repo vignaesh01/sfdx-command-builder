@@ -149,7 +149,8 @@ class SearchCommand extends React.Component{
     this.commands=this.props.commands || [];
     console.log("this.commands");
     console.log(this.commands);
-    this.finalCommands=this.getFinalCommands();
+    //this.finalCommands=this.getFinalCommands();
+    this.finalCommands=this.commands;
     this.state={
       filteredCommands :this.finalCommands
     }
@@ -162,14 +163,14 @@ class SearchCommand extends React.Component{
     this.setState({filteredCommands: filteredArr});
   }
 
-  getFinalCommands(){
+  /*getFinalCommands(){
     let finalCommandsArr = this.commands.filter(command=>{
       return !(command.mainTopic || command.hidden);
 
     });
 
     return finalCommandsArr;
-  }
+  }*/
 
   getFilteredCommands(filterKey){
 
@@ -178,13 +179,13 @@ class SearchCommand extends React.Component{
 
       let flag=false;
 
-      if(command && command.name && command.name!="" 
-      && command.name.toUpperCase().includes(filterKey.toUpperCase())){
+      if(command && command.id && command.id!="" 
+      && command.id.toUpperCase().includes(filterKey.toUpperCase())){
         flag|=true;
       }
 
-      if(command && command.longDescription && command.longDescription!=""
-      && command.longDescription.toUpperCase().includes(filterKey.toUpperCase())){
+      if(command && command.description && command.description!=""
+      && command.description.toUpperCase().includes(filterKey.toUpperCase())){
         flag|=true;
       }
 
@@ -202,13 +203,13 @@ class SearchCommand extends React.Component{
   render(){
     //this.setState({filteredCommands :this.commands});
     console.log("Inside SearchCommand render()");
-
+    
     const filteredArr=this.state.filteredCommands.map(command => {
-            
-      return (<ListItem button key={command.name} divider alignItems="flex-start"
+         
+      return (<ListItem button key={command.id} divider alignItems="flex-start"
       onClick={this.handleCommandClick.bind(this,command)}>
-        <ListItemText primary={command.name} 
-        secondary={command.longDescription}/>
+        <ListItemText primary={command.id} 
+        secondary={command.description}/>
       </ListItem>);
     
     });
@@ -254,7 +255,7 @@ class CommandBuilder extends React.Component{
               let flag=message.results;
               console.log("Inside onFileSelected listener "+flag.value);
               let selCommand=this.props.selectedCommand;
-              let fileFlags = selCommand.flags.filter(flg=>{
+              let fileFlags = Object.values(selCommand.flags).filter(flg=>{
                 return flg.name==flag.name;
               });
               
@@ -286,7 +287,7 @@ class CommandBuilder extends React.Component{
           <Paper square style={{padding: 5}}>
             <br/>
             <Typography variant="body2" gutterBottom>
-              {this.state.selCommand.longDescription}
+              {this.state.selCommand.description}
             </Typography>
             <br/>
             
@@ -331,16 +332,30 @@ class CommandBuilder extends React.Component{
                 </TableRow>
               </TableHead>
               <TableBody>
-                {this.state.selCommand.flags.map(flag => (
+                {/*this.state.selCommand.flags.map(flag => (
                   <TableRow key={flag.name}>
                     <TableCell component="th" scope="row">
                       
                       {this.getFlagControl(flag)}
                   
                     </TableCell>
-                    <TableCell>{flag.longDescription}</TableCell>
+                    <TableCell>{flag.description}</TableCell>
                   </TableRow>
-                ))}
+                ))*/
+                Object.values(this.state.selCommand.flags).map(flag => (
+                  <TableRow key={flag.name}>
+                  <TableCell component="th" scope="row">
+                    
+                    {this.getFlagControl(flag)}
+                
+                  </TableCell>
+                  <TableCell>{flag.description}</TableCell>
+               </TableRow>
+              )
+              )
+                
+                }
+
               </TableBody>
             </Table>
               
@@ -433,10 +448,34 @@ class CommandBuilder extends React.Component{
         value={flag.value} onChange={this.handleFlagChange.bind(this,flag)}/>
         );
     }
+    else if(flag.type=='option' && flag.options && Array.isArray(flag.options)){
+      //select box control
+      flagControl= (
+        <TextField
+        id="flagControl"
+        required={flag.required}
+        select
+        label={flag.name}
+        value={flag.value}
+        onChange={this.handleFlagChange.bind(this,flag)}
+        SelectProps={{
+          native: true
+        }}
+        variant="outlined"
+      >
+        <option key="emptyVal" value=""></option>
+        {flag.options.map(val => (
+          <option key={val} value={val}>
+            {val}
+          </option>
+        ))}
+      </TextField>
+      );
+    }
     else{
       flagControl= (
         <TextField id="flagControl" 
-        required={flag.required}
+        required={flag.required || false}
         label={flag.name} variant="outlined" 
         value={flag.value} onChange={this.handleFlagChange.bind(this,flag)}/>
         );
@@ -481,13 +520,13 @@ class CommandBuilder extends React.Component{
   generateCommand(){
     console.log('Inside generateCommand()');
 
-    let generatedCmd = 'sfdx '+ this.props.selectedCommand.name;
+    let generatedCmd = 'sfdx '+ this.props.selectedCommand.id;
     let genFlag='';
     let selCommand=this.props.selectedCommand;
 
     console.log('Inside generateCommand() '+generatedCmd +' '+JSON.stringify(selCommand));
 
-    selCommand.flags.forEach(flag => {
+    Object.values(selCommand.flags).forEach(flag => {
 
       if(flag.value && flag.value!==''){
         if(flag.type=='boolean'){
@@ -543,7 +582,7 @@ function CommandAppBar(props) {
 
   const showHelp = ()=>{
 
-    let helpCmd= 'sfdx '+ props.selectedCommand.name+' --help';
+    let helpCmd= 'sfdx '+ props.selectedCommand.id+' --help';
     vscode.postMessage({
       command: 'executeCommand',
       generatedCmd : helpCmd
@@ -561,7 +600,7 @@ function CommandAppBar(props) {
           <Icon>arrow_back</Icon>
           </IconButton>
           <Typography variant="h6" className={classes.title}>
-            {props.selectedCommand.name}
+            {props.selectedCommand.id}
           </Typography>
           <IconButton edge="start" color="inherit" onClick={showHelp}
           title="Help on this Command">

@@ -145,7 +145,8 @@ class CodingPanel {
 			
 
 			var p = new Promise(resolve => {
-				let sfdxCmd ="sfdx force:doc:commands:display --json ";
+				//let sfdxCmd ="sfdx force:doc:commands:display --json ";
+				let sfdxCmd ="sfdx commands --json ";
 				let workspacePath = vscode.workspace.workspaceFolders;
 				let foo: child.ChildProcess = child.exec(sfdxCmd,{
 					maxBuffer: 1024 * 1024 * 6,
@@ -176,8 +177,8 @@ class CodingPanel {
 				console.log('bufferOutData '+bufferOutData);
 				
 				let data = JSON.parse(bufferOutData);
-				let results = data.result;
-				this._panel.webview.postMessage({ command: 'onFetchAllCommands', results : results});
+				//let results = data.result;
+				this._panel.webview.postMessage({ command: 'onFetchAllCommands', results : data});
 				resolve();
 			});
 				
